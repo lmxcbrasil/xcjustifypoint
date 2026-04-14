@@ -855,6 +855,7 @@
 <script>
 // ── BASE DE DADOS ──
 const FUNCIONARIOS = {
+  "120090": { nome: "DIEGO OLIVEIRA DA SILVA", funcao: "COORDENADOR DE OPERACAO" },
   "120252": { nome: "ADELMO SANTOS BARBOSA", funcao: "OPERADOR DE CAMINHAO TIPO MUNC" },
   "120121": { nome: "AGNALDO WESLEN NUNES DE SOUSA", funcao: "OPERADOR DE GUINDASTE-70T A 10" },
   "120254": { nome: "ALEX DE OLIVEIRA NASCIMENTO", funcao: "OPERADOR DE GUINDASTE-40T A 69" },
@@ -907,16 +908,19 @@ const FUNCIONARIOS = {
   "120262": { nome: "MARIO SERGIO DE OLIVEIRA", funcao: "OPERADOR DE CAMINHAO TIPO MUNC" },
   "120238": { nome: "ÉDER CARLOS DIAS DA SILVA", funcao: "SUPERVISOR AREA OPERACAO" },
   "120236": { nome: "EDNELSON SILVA CARVALHO", funcao: "TECNICO EM SEGURANCA DO TRABAL" },
+  "120240": { nome: "LUCAS APPELT CARVALHO", funcao: "SUPERVISOR AREA OPERACAO"},
+  "120088": { nome: "JHONATAN GOMES DE LIMA", funcao: "SUPERVISOR AREA OPERACAO"},
+  "120085": { nome: "MARCOS JUNIOR SILVEIRA GOULART", funcao: "SUPERVISOR AREA OPERACAO"},
 };
 
 // Matrículas autorizadas para acesso gestor
-const GESTORES = ["120238", "120203"]; // Éder Carlos + Lucas (técnico) — adicione conforme necessário
+const GESTORES = ["120238", "120090", "120240", "120088", "120085"]; // Éder Carlos — adicione conforme necessário
 // Também permita qualquer matrícula de supervisor por nome
 const NOMES_GESTORES = [
-  "Lucas Appelt", "Éder Carlos", "Jhonatan Lima", "Marcos Goulart"
+  "Lucas Appelt", "Éder Carlos", "Jhonatan Lima", "Marcos Goulart", "Diego Oliveira"
 ];
 // Matrícula extra para gestores (coordenador)
-const MATRICULAS_GESTORES_EXTRA = ["120238"];
+const MATRICULAS_GESTORES_EXTRA = ["120090"];
 
 // Para fins do sistema, gestores podem ser qualquer matrícula cujo cargo inclua supervisor/técnico ou que esteja na lista
 function isGestor(mat) {
