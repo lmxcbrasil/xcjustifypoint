@@ -410,20 +410,81 @@
   .modal-panel.active { display: flex; }
 
   .panel-toolbar {
-    padding: 16px 24px;
+    padding: 14px 20px;
     background: var(--gray-7);
     border-bottom: 1px solid var(--gray-6);
-    display: flex; align-items: center; justify-content: space-between;
-    flex-wrap: wrap; gap: 12px;
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 14px;
   }
 
-  .panel-stats {
-    display: flex; gap: 20px; flex-wrap: wrap;
+  .panel-filters { display: flex; flex-direction: column; gap: 8px; flex: 1; min-width: 0; }
+
+  .filter-row {
+    display: flex; align-items: flex-end; gap: 10px; flex-wrap: wrap;
   }
 
-  .stat-item {
-    text-align: center;
+  .filter-group { display: flex; flex-direction: column; gap: 4px; }
+
+  .filter-label {
+    font-size: 11px; font-weight: 700;
+    text-transform: uppercase; letter-spacing: .6px;
+    color: var(--gray-4);
   }
+
+  .filter-input {
+    height: 36px;
+    border: 1.5px solid var(--gray-6);
+    border-radius: 7px;
+    padding: 0 10px;
+    font-family: 'Barlow', sans-serif;
+    font-size: 13px;
+    color: var(--gray-1);
+    background: var(--white);
+    transition: border-color .15s;
+    appearance: none; -webkit-appearance: none;
+  }
+  .filter-input:focus { outline: none; border-color: var(--royal-mid); }
+
+  .filter-select-wrap { position: relative; }
+  .filter-select-wrap::after {
+    content: '▾'; position: absolute; right: 9px; top: 50%; transform: translateY(-50%);
+    color: var(--gray-4); pointer-events: none; font-size: 11px;
+  }
+  .filter-select-wrap select { padding-right: 26px; cursor: pointer; min-width: 180px; }
+
+  .btn-limpar {
+    height: 36px; padding: 0 12px;
+    background: none; border: 1.5px solid var(--gray-6);
+    border-radius: 7px; font-family: 'Barlow', sans-serif;
+    font-size: 12px; font-weight: 600; color: var(--gray-4);
+    cursor: pointer; transition: all .15s; white-space: nowrap;
+    align-self: flex-end;
+  }
+  .btn-limpar:hover { border-color: var(--error); color: var(--error); }
+
+  .filter-shortcuts {
+    display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+  }
+  .shortcut-label { font-size: 11px; color: var(--gray-5); font-weight: 600; text-transform: uppercase; letter-spacing: .5px; }
+
+  .btn-shortcut {
+    height: 28px; padding: 0 12px;
+    background: var(--royal-pale); border: 1px solid #c1cef0;
+    border-radius: 20px; font-family: 'Barlow', sans-serif;
+    font-size: 12px; font-weight: 600; color: var(--royal);
+    cursor: pointer; transition: background .15s;
+    white-space: nowrap;
+  }
+  .btn-shortcut:hover { background: #c1cef0; }
+
+  .panel-toolbar-right {
+    display: flex; align-items: center; gap: 16px; flex-shrink: 0;
+  }
+
+  .panel-stats { display: flex; gap: 20px; flex-wrap: wrap; align-items: center; }
   .stat-num {
     font-family: 'Barlow Condensed', sans-serif;
     font-size: 26px; font-weight: 900;
@@ -497,6 +558,8 @@
     font-weight: 700;
     letter-spacing: .3px;
   }
+  .badge-entrada { background: #dcfce7; color: #15803d; }
+  .badge-saida   { background: #fee2e2; color: #b91c1c; }
   .badge-adm { background: #f3e8ff; color: #6b21a8; }
   .badge-b { background: #dcfce7; color: #15803d; }
   .badge-c { background: #fef9c3; color: #854d0e; }
@@ -593,6 +656,36 @@
 
       <div class="divider"></div>
 
+      <!-- TIPO DE MARCAÇÃO -->
+      <div class="field">
+        <label>Tipo de Marcação <span class="req">*</span></label>
+        <div class="select-wrap">
+          <select id="tipo-marcacao">
+            <option value="">— Selecione —</option>
+            <option value="Entrada">Entrada</option>
+            <option value="Saída">Saída</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- MOTIVO -->
+      <div class="field">
+        <label>Motivo da Justificativa <span class="req">*</span></label>
+        <div class="select-wrap">
+          <select id="motivo-select">
+            <option value="">— Selecione o motivo —</option>
+            <option value="Trabalho externo ou viagem">Trabalho externo ou viagem</option>
+            <option value="Falha no equipamento de registro de ponto">Falha no equipamento de registro de ponto</option>
+            <option value="Digital / Face ID não cadastrado">Digital / Face ID não cadastrado</option>
+            <option value="Esquecimento de marcação de ponto no horário devido">Esquecimento de marcação de ponto no horário devido</option>
+            <option value="Atestado">Atestado</option>
+            <option value="Exame periódico anual para renovação do ASO">Exame periódico anual para renovação do ASO</option>
+            <option value="Atraso na rota do ônibus">Atraso na rota do ônibus</option>
+            <option value="Incidente de saúde (Ambulatório)">Incidente de saúde (Ambulatório)</option>
+          </select>
+        </div>
+      </div>
+
       <!-- DIA E HORA -->
       <div class="row-2">
         <div class="field">
@@ -687,19 +780,47 @@
       <div class="panel-logado">🔐 Logado como: <strong id="gestor-nome-logado"></strong></div>
 
       <div class="panel-toolbar">
-        <div class="panel-stats">
-          <div class="stat-item">
-            <div class="stat-num" id="stat-total">0</div>
-            <div class="stat-lbl">Registros</div>
+        <div class="panel-filters">
+          <div class="filter-row">
+            <div class="filter-group">
+              <label class="filter-label">De</label>
+              <input type="date" id="filtro-de" class="filter-input" onchange="renderTabela()">
+            </div>
+            <div class="filter-group">
+              <label class="filter-label">Até</label>
+              <input type="date" id="filtro-ate" class="filter-input" onchange="renderTabela()">
+            </div>
+            <div class="filter-group">
+              <label class="filter-label">Função</label>
+              <div class="filter-select-wrap">
+                <select id="filtro-funcao" class="filter-input" onchange="renderTabela()">
+                  <option value="">Todas</option>
+                </select>
+              </div>
+            </div>
+            <button class="btn-limpar" onclick="limparFiltros()">✕ Limpar</button>
           </div>
-          <div class="stat-item">
-            <div class="stat-num" id="stat-hoje">0</div>
-            <div class="stat-lbl">Hoje</div>
+          <div class="filter-shortcuts">
+            <span class="shortcut-label">Período rápido:</span>
+            <button class="btn-shortcut" onclick="setPeriodoFolha()">Folha atual (10→9)</button>
+            <button class="btn-shortcut" onclick="setPeriodoMesAtual()">Mês atual</button>
           </div>
         </div>
-        <button class="btn-export" onclick="exportarExcel()">
-          📊 Exportar Excel (.xlsx)
-        </button>
+        <div class="panel-toolbar-right">
+          <div class="panel-stats">
+            <div class="stat-item">
+              <div class="stat-num" id="stat-total">0</div>
+              <div class="stat-lbl">Total</div>
+            </div>
+            <div class="stat-item">
+              <div class="stat-num" id="stat-filtrado">0</div>
+              <div class="stat-lbl">Filtrados</div>
+            </div>
+          </div>
+          <button class="btn-export" onclick="exportarExcel()">
+            📊 Exportar Excel (.xlsx)
+          </button>
+        </div>
       </div>
 
       <div class="panel-table-wrap">
@@ -712,12 +833,14 @@
             <tr>
               <th>#</th>
               <th>Data / Hora Falha</th>
+              <th>Tipo</th>
               <th>Matrícula</th>
               <th>Nome</th>
               <th>Função</th>
               <th>Turno</th>
               <th>Gestor</th>
-              <th>Justificativa</th>
+              <th>Motivo</th>
+              <th>Observação</th>
               <th>Registrado em</th>
             </tr>
           </thead>
@@ -839,6 +962,8 @@ function buscarFuncionario(val) {
 // ── REGISTRAR ──
 function registrar() {
   const mat = document.getElementById('matricula').value.trim();
+  const tipoMarcacao = document.getElementById('tipo-marcacao').value;
+  const motivoSelect = document.getElementById('motivo-select').value;
   const data = document.getElementById('data-falha').value;
   const hora = document.getElementById('hora-falha').value;
   const turno = document.getElementById('turno').value;
@@ -846,11 +971,13 @@ function registrar() {
   const obs = document.getElementById('observacao').value.trim();
 
   if (!mat || !FUNCIONARIOS[mat]) { alert('Por favor, informe uma matrícula válida.'); return; }
+  if (!tipoMarcacao) { alert('Selecione o tipo de marcação (Entrada ou Saída).'); return; }
+  if (!motivoSelect) { alert('Selecione o motivo da justificativa.'); return; }
   if (!data) { alert('Informe a data da falha.'); return; }
   if (!hora) { alert('Informe a hora da falha.'); return; }
   if (!turno) { alert('Selecione o turno.'); return; }
   if (!supervisor) { alert('Selecione o gestor responsável.'); return; }
-  if (!obs) { alert('O campo "Motivo / Justificativa" é obrigatório.'); return; }
+  if (!obs) { alert('O campo "Observação" é obrigatório.'); return; }
 
   const f = FUNCIONARIOS[mat];
   const agora = new Date();
@@ -859,6 +986,8 @@ function registrar() {
     matricula: mat,
     nome: f.nome,
     funcao: f.funcao,
+    tipoMarcacao: tipoMarcacao,
+    motivoSelect: motivoSelect,
     dataFalha: data,
     horaFalha: hora,
     turno: turno,
@@ -872,9 +1001,11 @@ function registrar() {
 
   const banner = document.getElementById('success-banner');
   document.getElementById('success-text').textContent =
-    `${f.nome} — ${data} às ${hora} | Turno ${turno} | Gestor: ${supervisor}`;
+    `${f.nome} — ${tipoMarcacao} | ${data} às ${hora} | Turno ${turno} | Gestor: ${supervisor}`;
   banner.style.display = 'block';
 
+  document.getElementById('tipo-marcacao').value = '';
+  document.getElementById('motivo-select').value = '';
   document.getElementById('data-falha').value = '';
   document.getElementById('hora-falha').value = '';
   document.getElementById('turno').value = '';
@@ -922,17 +1053,38 @@ function fazerLogin() {
 // ── RENDERIZAR TABELA ──
 function renderTabela() {
   registros = JSON.parse(localStorage.getItem('ponto_registros') || '[]');
+
+  // Popular filtro de funções
+  const selectFuncao = document.getElementById('filtro-funcao');
+  const funcaoAtual = selectFuncao.value;
+  const funcoes = [...new Set(registros.map(r => r.funcao))].sort();
+  selectFuncao.innerHTML = '<option value="">Todas</option>' +
+    funcoes.map(f => `<option value="${f}" ${f === funcaoAtual ? 'selected' : ''}>${capitalizar(f)}</option>`).join('');
+
+  // Ler filtros
+  const filtroDE = document.getElementById('filtro-de').value;
+  const filtroATE = document.getElementById('filtro-ate').value;
+  const filtroFUNCAO = selectFuncao.value;
+
+  // Filtrar
+  let filtrados = registros.filter(r => {
+    if (filtroDE && r.dataFalha < filtroDE) return false;
+    if (filtroATE && r.dataFalha > filtroATE) return false;
+    if (filtroFUNCAO && r.funcao !== filtroFUNCAO) return false;
+    return true;
+  });
+
+  document.getElementById('stat-total').textContent = registros.length;
+  document.getElementById('stat-filtrado').textContent = filtrados.length;
+
   const tbody = document.getElementById('tbody');
   const tabela = document.getElementById('tabela-registros');
   const empty = document.getElementById('empty-state');
 
-  document.getElementById('stat-total').textContent = registros.length;
-  const hoje = new Date().toISOString().slice(0,10);
-  const countHoje = registros.filter(r => r.dataFalha === hoje).length;
-  document.getElementById('stat-hoje').textContent = countHoje;
-
-  if (!registros.length) {
+  if (!filtrados.length) {
     empty.style.display = 'block';
+    document.querySelector('.empty-state .e-text').textContent =
+      registros.length ? 'Nenhum registro no período/filtro selecionado.' : 'Nenhum registro encontrado ainda.';
     tabela.style.display = 'none';
     return;
   }
@@ -941,24 +1093,61 @@ function renderTabela() {
   tabela.style.display = 'table';
   tbody.innerHTML = '';
 
-  const ordenados = [...registros].reverse();
+  const ordenados = [...filtrados].reverse();
   ordenados.forEach((r, i) => {
     const turnoKey = r.turno.toLowerCase();
     const badgeClass = turnoKey === 'adm' ? 'badge-adm' : `badge-${turnoKey}`;
+    const tipoBadge = r.tipoMarcacao === 'Entrada' ? 'badge-entrada' : 'badge-saida';
     const tr = document.createElement('tr');
     tr.innerHTML = `
       <td>${ordenados.length - i}</td>
       <td>${formatarData(r.dataFalha)} ${r.horaFalha}</td>
+      <td><span class="badge ${tipoBadge}">${r.tipoMarcacao || '—'}</span></td>
       <td><strong>${r.matricula}</strong></td>
       <td>${capitalizar(r.nome)}</td>
       <td style="color:var(--gray-4)">${capitalizar(r.funcao)}</td>
       <td><span class="badge ${badgeClass}">Turno ${r.turno}</span></td>
       <td>${r.supervisor}</td>
-      <td style="max-width:160px;white-space:normal;color:var(--gray-4)">${r.observacao || '—'}</td>
+      <td style="max-width:180px;white-space:normal;color:var(--gray-3);font-size:12px">${r.motivoSelect || '—'}</td>
+      <td style="max-width:140px;white-space:normal;color:var(--gray-4);font-size:12px">${r.observacao || '—'}</td>
       <td style="color:var(--gray-5);font-size:12px">${r.registradoEm}</td>
     `;
     tbody.appendChild(tr);
   });
+
+  // Guardar filtrados para exportar só o que está filtrado
+  window._registrosFiltrados = filtrados;
+}
+
+function limparFiltros() {
+  document.getElementById('filtro-de').value = '';
+  document.getElementById('filtro-ate').value = '';
+  document.getElementById('filtro-funcao').value = '';
+  renderTabela();
+}
+
+function setPeriodoFolha() {
+  const hoje = new Date();
+  let de, ate;
+  if (hoje.getDate() >= 10) {
+    de = new Date(hoje.getFullYear(), hoje.getMonth(), 10);
+    ate = new Date(hoje.getFullYear(), hoje.getMonth() + 1, 9);
+  } else {
+    de = new Date(hoje.getFullYear(), hoje.getMonth() - 1, 10);
+    ate = new Date(hoje.getFullYear(), hoje.getMonth(), 9);
+  }
+  document.getElementById('filtro-de').value = de.toISOString().slice(0,10);
+  document.getElementById('filtro-ate').value = ate.toISOString().slice(0,10);
+  renderTabela();
+}
+
+function setPeriodoMesAtual() {
+  const hoje = new Date();
+  const de = new Date(hoje.getFullYear(), hoje.getMonth(), 1);
+  const ate = new Date(hoje.getFullYear(), hoje.getMonth() + 1, 0);
+  document.getElementById('filtro-de').value = de.toISOString().slice(0,10);
+  document.getElementById('filtro-ate').value = ate.toISOString().slice(0,10);
+  renderTabela();
 }
 
 function formatarData(d) {
@@ -973,65 +1162,66 @@ function capitalizar(str) {
 
 // ── EXPORTAR EXCEL ──
 function exportarExcel() {
-  if (!registros.length) { alert('Nenhum registro para exportar.'); return; }
+  const lista = window._registrosFiltrados || registros;
+  if (!lista.length) { alert('Nenhum registro para exportar.'); return; }
 
-  const dados = registros.map((r, i) => ({
+  const dados = lista.map((r, i) => ({
     'Nº': i + 1,
     'Data da Falha': formatarData(r.dataFalha),
     'Hora da Falha': r.horaFalha,
+    'Tipo': r.tipoMarcacao || '',
     'Matrícula': r.matricula,
     'Nome': capitalizar(r.nome),
     'Função / Cargo': capitalizar(r.funcao),
     'Turno': `Turno ${r.turno}`,
     'Gestor Responsável': r.supervisor,
-    'Justificativa / Motivo': r.observacao || '',
+    'Motivo': r.motivoSelect || '',
+    'Observação': r.observacao || '',
     'Registrado em': r.registradoEm,
   }));
 
   const ws = XLSX.utils.json_to_sheet(dados);
-
   ws['!cols'] = [
-    { wch: 5 },
-    { wch: 14 },
-    { wch: 12 },
-    { wch: 12 },
-    { wch: 32 },
-    { wch: 30 },
-    { wch: 12 },
-    { wch: 22 },
-    { wch: 40 },
-    { wch: 22 },
+    { wch: 5 }, { wch: 14 }, { wch: 12 }, { wch: 10 },
+    { wch: 12 }, { wch: 32 }, { wch: 30 }, { wch: 12 },
+    { wch: 22 }, { wch: 44 }, { wch: 36 }, { wch: 22 },
   ];
 
   const wb = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(wb, ws, 'Justificativas de Ponto');
 
   const agora = new Date();
-  const gestores = {};
-  const turnos = { A: 0, B: 0, C: 0, D: 0, ADM: 0 };
-  registros.forEach(r => {
+  const gestores = {}, turnos = { A:0, B:0, C:0, D:0, ADM:0 }, motivos = {};
+  lista.forEach(r => {
     gestores[r.supervisor] = (gestores[r.supervisor] || 0) + 1;
     if (turnos[r.turno] !== undefined) turnos[r.turno]++;
+    if (r.motivoSelect) motivos[r.motivoSelect] = (motivos[r.motivoSelect] || 0) + 1;
   });
+
+  const filtroDE = document.getElementById('filtro-de').value;
+  const filtroATE = document.getElementById('filtro-ate').value;
+  const periodoStr = filtroDE || filtroATE
+    ? `Período: ${filtroDE ? formatarData(filtroDE) : '—'} até ${filtroATE ? formatarData(filtroATE) : '—'}`
+    : 'Período: todos os registros';
 
   const resumoDados = [
     ['RESUMO — JUSTIFICATIVA DE BATIDA DE PONTO'],
     [`Gerado em: ${agora.toLocaleString('pt-BR')}`],
-    [`Total de registros: ${registros.length}`],
+    [periodoStr],
+    [`Total de registros exportados: ${lista.length}`],
     [],
     ['Por Gestor', 'Quantidade'],
     ...Object.entries(gestores).map(([k,v]) => [k, v]),
     [],
     ['Por Turno', 'Quantidade'],
-    ['Turno A', turnos.A],
-    ['Turno B', turnos.B],
-    ['Turno C', turnos.C],
-    ['Turno D', turnos.D],
-    ['Turno ADM', turnos.ADM],
+    ...Object.entries(turnos).map(([k,v]) => [`Turno ${k}`, v]),
+    [],
+    ['Por Motivo', 'Quantidade'],
+    ...Object.entries(motivos).map(([k,v]) => [k, v]),
   ];
 
   const ws2 = XLSX.utils.aoa_to_sheet(resumoDados);
-  ws2['!cols'] = [{ wch: 28 }, { wch: 14 }];
+  ws2['!cols'] = [{ wch: 46 }, { wch: 14 }];
   XLSX.utils.book_append_sheet(wb, ws2, 'Resumo');
 
   const data = agora.toISOString().slice(0,10);
