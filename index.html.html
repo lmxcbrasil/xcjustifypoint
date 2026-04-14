@@ -244,49 +244,6 @@
     box-shadow: 0 0 0 3px rgba(33,80,194,.12);
   }
 
-  /* ── UPLOAD AREA ── */
-  .upload-area {
-    border: 2px dashed var(--gray-6);
-    border-radius: 8px;
-    padding: 22px 16px;
-    text-align: center;
-    cursor: pointer;
-    transition: border-color .18s, background .18s;
-    background: var(--gray-7);
-  }
-  .upload-area:hover {
-    border-color: var(--royal-mid);
-    background: var(--royal-pale);
-  }
-  .upload-icon { font-size: 24px; margin-bottom: 6px; }
-  .upload-text { font-size: 14px; font-weight: 600; color: var(--gray-3); margin-bottom: 3px; }
-  .upload-hint { font-size: 12px; color: var(--gray-5); }
-
-  .upload-preview {
-    margin-top: 10px;
-    background: var(--royal-pale);
-    border: 1px solid #c1cef0;
-    border-radius: 8px;
-    padding: 10px 14px;
-    display: flex; align-items: center; justify-content: space-between;
-  }
-  .preview-info { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--royal-dark); font-weight: 500; }
-  .preview-icon { font-size: 18px; }
-
-  .btn-remover-img {
-    background: none; border: 1px solid #e8b4ae;
-    color: var(--error); border-radius: 6px;
-    padding: 4px 10px; font-size: 12px; font-weight: 600;
-    cursor: pointer; white-space: nowrap;
-    transition: background .15s;
-  }
-  .btn-remover-img:hover { background: #fdf0ee; }
-
-  .upload-error {
-    margin-top: 7px;
-    font-size: 12px; color: var(--error);
-  }
-
   /* ── SUBMIT BTN ── */
   .btn-submit {
     width: 100%;
@@ -684,25 +641,6 @@
         <textarea id="observacao" placeholder="Descreva o motivo da falha na batida de ponto..."></textarea>
       </div>
 
-      <!-- ANEXAR IMAGEM -->
-      <div class="field">
-        <label>Anexar Comprovante (opcional) — máx. 5 MB</label>
-        <div class="upload-area" id="upload-area" onclick="document.getElementById('arquivo-img').click()">
-          <div class="upload-icon">📎</div>
-          <div class="upload-text">Clique para selecionar uma imagem</div>
-          <div class="upload-hint">JPG, PNG, WEBP ou PDF — até 5 MB</div>
-        </div>
-        <input type="file" id="arquivo-img" accept="image/*,application/pdf" style="display:none" onchange="handleArquivo(this)">
-        <div class="upload-preview" id="upload-preview" style="display:none">
-          <div class="preview-info">
-            <span class="preview-icon">🖼️</span>
-            <span id="preview-nome"></span>
-            <span id="preview-tamanho" style="color:var(--gray-5);font-size:12px;margin-left:6px"></span>
-          </div>
-          <button type="button" class="btn-remover-img" onclick="removerArquivo()">✕ Remover</button>
-        </div>
-        <div class="upload-error" id="upload-error" style="display:none">⚠ Arquivo muito grande. Máximo permitido: 5 MB.</div>
-      </div>
 
       <button class="btn-submit" onclick="registrar()">✔ Enviar</button>
 
@@ -780,7 +718,6 @@
               <th>Turno</th>
               <th>Gestor</th>
               <th>Justificativa</th>
-              <th>Anexo</th>
               <th>Registrado em</th>
             </tr>
           </thead>
@@ -869,32 +806,6 @@ function isGestor(mat) {
 
 let registros = JSON.parse(localStorage.getItem('ponto_registros') || '[]');
 let gestorLogado = null;
-let arquivoAnexo = null;
-
-// ── UPLOAD DE ARQUIVO ──
-function handleArquivo(input) {
-  const file = input.files[0];
-  const errEl = document.getElementById('upload-error');
-  const preview = document.getElementById('upload-preview');
-  errEl.style.display = 'none';
-  if (!file) return;
-  if (file.size > 5 * 1024 * 1024) {
-    errEl.style.display = 'block';
-    input.value = '';
-    return;
-  }
-  arquivoAnexo = { nome: file.name, tamanho: (file.size / 1024).toFixed(1) + ' KB' };
-  document.getElementById('preview-nome').textContent = file.name;
-  document.getElementById('preview-tamanho').textContent = arquivoAnexo.tamanho;
-  preview.style.display = 'flex';
-}
-
-function removerArquivo() {
-  arquivoAnexo = null;
-  document.getElementById('arquivo-img').value = '';
-  document.getElementById('upload-preview').style.display = 'none';
-  document.getElementById('upload-error').style.display = 'none';
-}
 
 // ── BUSCAR FUNCIONÁRIO ──
 function buscarFuncionario(val) {
@@ -953,7 +864,6 @@ function registrar() {
     turno: turno,
     supervisor: supervisor,
     observacao: obs,
-    anexoNome: arquivoAnexo ? arquivoAnexo.nome : '',
     registradoEm: agora.toLocaleString('pt-BR')
   };
 
@@ -965,13 +875,11 @@ function registrar() {
     `${f.nome} — ${data} às ${hora} | Turno ${turno} | Gestor: ${supervisor}`;
   banner.style.display = 'block';
 
-  // Limpar campos de ocorrência (manter matrícula/nome)
   document.getElementById('data-falha').value = '';
   document.getElementById('hora-falha').value = '';
   document.getElementById('turno').value = '';
   document.getElementById('supervisor').value = '';
   document.getElementById('observacao').value = '';
-  removerArquivo();
 
   banner.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
 }
@@ -1047,7 +955,6 @@ function renderTabela() {
       <td><span class="badge ${badgeClass}">Turno ${r.turno}</span></td>
       <td>${r.supervisor}</td>
       <td style="max-width:160px;white-space:normal;color:var(--gray-4)">${r.observacao || '—'}</td>
-      <td style="color:var(--gray-5);font-size:12px">${r.anexoNome ? '📎 ' + r.anexoNome : '—'}</td>
       <td style="color:var(--gray-5);font-size:12px">${r.registradoEm}</td>
     `;
     tbody.appendChild(tr);
@@ -1078,7 +985,6 @@ function exportarExcel() {
     'Turno': `Turno ${r.turno}`,
     'Gestor Responsável': r.supervisor,
     'Justificativa / Motivo': r.observacao || '',
-    'Anexo': r.anexoNome || '',
     'Registrado em': r.registradoEm,
   }));
 
@@ -1094,7 +1000,6 @@ function exportarExcel() {
     { wch: 12 },
     { wch: 22 },
     { wch: 40 },
-    { wch: 25 },
     { wch: 22 },
   ];
 
