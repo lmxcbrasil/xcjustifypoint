@@ -689,12 +689,12 @@
       <!-- DIA E HORA -->
       <div class="row-2">
         <div class="field">
-          <label>Data da Falha <span class="req">*</span></label>
-          <input type="date" id="data-falha">
+          <label>Data <span class="req">*</span></label>
+          <input type="date" id="data">
         </div>
         <div class="field">
-          <label>Hora da Falha <span class="req">*</span></label>
-          <input type="time" id="hora-falha">
+          <label>Hora <span class="req">*</span></label>
+          <input type="time" id="hora">
         </div>
       </div>
 
@@ -739,7 +739,7 @@
 
       <div class="success-banner" id="success-banner">
         <div class="s-icon">✅</div>
-        <div class="s-title">Falha registrada com sucesso!</div>
+        <div class="s-title">Registrada com sucesso!</div>
         <div class="s-text" id="success-text"></div>
       </div>
 
@@ -832,7 +832,7 @@
           <thead>
             <tr>
               <th>#</th>
-              <th>Data / Hora Falha</th>
+              <th>Data / Hora</th>
               <th>Tipo</th>
               <th>Matrícula</th>
               <th>Nome</th>
@@ -968,8 +968,8 @@ function registrar() {
   const mat = document.getElementById('matricula').value.trim();
   const tipoMarcacao = document.getElementById('tipo-marcacao').value;
   const motivoSelect = document.getElementById('motivo-select').value;
-  const data = document.getElementById('data-falha').value;
-  const hora = document.getElementById('hora-falha').value;
+  const data = document.getElementById('data').value;
+  const hora = document.getElementById('hora').value;
   const turno = document.getElementById('turno').value;
   const supervisor = document.getElementById('supervisor').value;
   const obs = document.getElementById('observacao').value.trim();
@@ -977,8 +977,8 @@ function registrar() {
   if (!mat || !FUNCIONARIOS[mat]) { alert('Por favor, informe uma matrícula válida.'); return; }
   if (!tipoMarcacao) { alert('Selecione o tipo de marcação (Entrada ou Saída).'); return; }
   if (!motivoSelect) { alert('Selecione o motivo da justificativa.'); return; }
-  if (!data) { alert('Informe a data da falha.'); return; }
-  if (!hora) { alert('Informe a hora da falha.'); return; }
+  if (!data) { alert('Informe a data.'); return; }
+  if (!hora) { alert('Informe a hora.'); return; }
   if (!turno) { alert('Selecione o turno.'); return; }
   if (!supervisor) { alert('Selecione o gestor responsável.'); return; }
   if (!obs) { alert('O campo "Observação" é obrigatório.'); return; }
@@ -992,8 +992,8 @@ function registrar() {
     funcao: f.funcao,
     tipoMarcacao: tipoMarcacao,
     motivoSelect: motivoSelect,
-    dataFalha: data,
-    horaFalha: hora,
+    data: data,
+    hora: hora,
     turno: turno,
     supervisor: supervisor,
     observacao: obs,
@@ -1010,8 +1010,8 @@ function registrar() {
 
   document.getElementById('tipo-marcacao').value = '';
   document.getElementById('motivo-select').value = '';
-  document.getElementById('data-falha').value = '';
-  document.getElementById('hora-falha').value = '';
+  document.getElementById('data').value = '';
+  document.getElementById('hora').value = '';
   document.getElementById('turno').value = '';
   document.getElementById('supervisor').value = '';
   document.getElementById('observacao').value = '';
@@ -1072,8 +1072,8 @@ function renderTabela() {
 
   // Filtrar
   let filtrados = registros.filter(r => {
-    if (filtroDE && r.dataFalha < filtroDE) return false;
-    if (filtroATE && r.dataFalha > filtroATE) return false;
+    if (filtroDE && r.data < filtroDE) return false;
+    if (filtroATE && r.data > filtroATE) return false;
     if (filtroFUNCAO && r.funcao !== filtroFUNCAO) return false;
     return true;
   });
@@ -1105,7 +1105,7 @@ function renderTabela() {
     const tr = document.createElement('tr');
     tr.innerHTML = `
       <td>${ordenados.length - i}</td>
-      <td>${formatarData(r.dataFalha)} ${r.horaFalha}</td>
+      <td>${formatarData(r.data)} ${r.hora}</td>
       <td><span class="badge ${tipoBadge}">${r.tipoMarcacao || '—'}</span></td>
       <td><strong>${r.matricula}</strong></td>
       <td>${capitalizar(r.nome)}</td>
@@ -1171,8 +1171,8 @@ function exportarExcel() {
 
   const dados = lista.map((r, i) => ({
     'Nº': i + 1,
-    'Data da Falha': formatarData(r.dataFalha),
-    'Hora da Falha': r.horaFalha,
+    'Data': formatarData(r.data),
+    'Hora': r.hora,
     'Tipo': r.tipoMarcacao || '',
     'Matrícula': r.matricula,
     'Nome': capitalizar(r.nome),
@@ -1233,7 +1233,7 @@ function exportarExcel() {
 }
 
 // Definir data de hoje como padrão
-document.getElementById('data-falha').valueAsDate = new Date();
+document.getElementById('data').valueAsDate = new Date();
 </script>
 </body>
 </html>
