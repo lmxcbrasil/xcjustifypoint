@@ -1,0 +1,1140 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Justificativa de Batida de Ponto</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Barlow:wght@300;400;500;600;700;900&family=Barlow+Condensed:wght@600;700;900&display=swap');
+
+  :root {
+    --royal: #1a3a8f;
+    --royal-dark: #0f2460;
+    --royal-mid: #2150c2;
+    --royal-light: #3a6fd8;
+    --royal-pale: #e8edf8;
+    --white: #ffffff;
+    --black: #0a0a0a;
+    --gray-1: #1c1c1e;
+    --gray-2: #2c2c2e;
+    --gray-3: #48484a;
+    --gray-4: #636366;
+    --gray-5: #aeaeb2;
+    --gray-6: #d1d1d6;
+    --gray-7: #f2f2f7;
+    --accent: #1a3a8f;
+    --success: #1c7a3d;
+    --error: #c0392b;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Barlow', sans-serif;
+    background: var(--gray-7);
+    color: var(--gray-1);
+    min-height: 100vh;
+  }
+
+  /* ── HEADER ── */
+  .header {
+    background: var(--royal-dark);
+    border-bottom: 3px solid var(--royal-light);
+    padding: 0 32px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 64px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 2px 16px rgba(0,0,0,.35);
+  }
+
+  .header-brand {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+
+  .header-icon {
+    width: 38px; height: 38px;
+    background: var(--royal-light);
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 20px;
+  }
+
+  .header-title {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 700;
+    font-size: 18px;
+    color: var(--white);
+    letter-spacing: .5px;
+    line-height: 1.1;
+  }
+
+  .header-sub {
+    font-size: 11px;
+    color: var(--gray-5);
+    font-weight: 400;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+
+  .btn-gestor {
+    background: transparent;
+    border: 1.5px solid rgba(255,255,255,.35);
+    color: var(--white);
+    font-family: 'Barlow', sans-serif;
+    font-weight: 600;
+    font-size: 13px;
+    padding: 8px 18px;
+    border-radius: 6px;
+    cursor: pointer;
+    display: flex; align-items: center; gap: 7px;
+    transition: all .2s;
+    letter-spacing: .3px;
+  }
+  .btn-gestor:hover {
+    background: rgba(255,255,255,.12);
+    border-color: rgba(255,255,255,.6);
+  }
+
+  /* ── MAIN LAYOUT ── */
+  .page {
+    max-width: 680px;
+    margin: 0 auto;
+    padding: 40px 20px 60px;
+  }
+
+  .page-title {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 30px;
+    font-weight: 900;
+    color: var(--royal-dark);
+    letter-spacing: .3px;
+    margin-bottom: 4px;
+  }
+
+  .page-desc {
+    color: var(--gray-4);
+    font-size: 14px;
+    margin-bottom: 32px;
+  }
+
+  /* ── CARD ── */
+  .card {
+    background: var(--white);
+    border-radius: 12px;
+    border: 1px solid var(--gray-6);
+    overflow: hidden;
+    box-shadow: 0 1px 8px rgba(0,0,0,.07);
+  }
+
+  .card-header {
+    background: var(--royal);
+    padding: 16px 24px;
+    display: flex; align-items: center; gap: 10px;
+  }
+
+  .card-header-icon { font-size: 18px; }
+
+  .card-header-title {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 700;
+    font-size: 16px;
+    color: var(--white);
+    letter-spacing: .5px;
+    text-transform: uppercase;
+  }
+
+  .card-body { padding: 28px 28px; }
+
+  /* ── FORM ── */
+  .field { margin-bottom: 22px; }
+
+  .field label {
+    display: block;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: .8px;
+    color: var(--gray-4);
+    margin-bottom: 7px;
+  }
+
+  .field label span.req { color: var(--royal-mid); }
+
+  .field input, .field select {
+    width: 100%;
+    height: 46px;
+    border: 1.5px solid var(--gray-6);
+    border-radius: 8px;
+    padding: 0 14px;
+    font-family: 'Barlow', sans-serif;
+    font-size: 15px;
+    color: var(--gray-1);
+    background: var(--white);
+    transition: border-color .18s, box-shadow .18s;
+    appearance: none;
+    -webkit-appearance: none;
+  }
+
+  .field input:focus, .field select:focus {
+    outline: none;
+    border-color: var(--royal-mid);
+    box-shadow: 0 0 0 3px rgba(33,80,194,.12);
+  }
+
+  .field input.readonly-styled {
+    background: var(--gray-7);
+    color: var(--gray-3);
+    cursor: default;
+    border-color: var(--gray-6);
+  }
+
+  .field .select-wrap { position: relative; }
+  .field .select-wrap::after {
+    content: '▾';
+    position: absolute; right: 14px; top: 50%; transform: translateY(-50%);
+    color: var(--gray-4); pointer-events: none; font-size: 13px;
+  }
+  .field .select-wrap select { padding-right: 36px; cursor: pointer; }
+
+  .row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+
+  .field-info {
+    font-size: 12px;
+    color: var(--gray-5);
+    margin-top: 5px;
+  }
+
+  /* ── INFO BOX ── */
+  .info-box {
+    background: var(--royal-pale);
+    border: 1px solid #c1cef0;
+    border-radius: 8px;
+    padding: 14px 16px;
+    margin-bottom: 22px;
+    display: flex; gap: 10px;
+  }
+  .info-box-icon { font-size: 18px; flex-shrink: 0; margin-top: 1px; }
+  .info-box-text { font-size: 14px; color: var(--royal-dark); line-height: 1.5; }
+  .info-box-text strong { font-weight: 700; display: block; margin-bottom: 2px; }
+
+  /* ── TEXTAREA ── */
+  .field textarea {
+    width: 100%;
+    border: 1.5px solid var(--gray-6);
+    border-radius: 8px;
+    padding: 12px 14px;
+    font-family: 'Barlow', sans-serif;
+    font-size: 15px;
+    color: var(--gray-1);
+    background: var(--white);
+    resize: vertical;
+    min-height: 80px;
+    transition: border-color .18s, box-shadow .18s;
+  }
+  .field textarea:focus {
+    outline: none;
+    border-color: var(--royal-mid);
+    box-shadow: 0 0 0 3px rgba(33,80,194,.12);
+  }
+
+  /* ── UPLOAD AREA ── */
+  .upload-area {
+    border: 2px dashed var(--gray-6);
+    border-radius: 8px;
+    padding: 22px 16px;
+    text-align: center;
+    cursor: pointer;
+    transition: border-color .18s, background .18s;
+    background: var(--gray-7);
+  }
+  .upload-area:hover {
+    border-color: var(--royal-mid);
+    background: var(--royal-pale);
+  }
+  .upload-icon { font-size: 24px; margin-bottom: 6px; }
+  .upload-text { font-size: 14px; font-weight: 600; color: var(--gray-3); margin-bottom: 3px; }
+  .upload-hint { font-size: 12px; color: var(--gray-5); }
+
+  .upload-preview {
+    margin-top: 10px;
+    background: var(--royal-pale);
+    border: 1px solid #c1cef0;
+    border-radius: 8px;
+    padding: 10px 14px;
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .preview-info { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--royal-dark); font-weight: 500; }
+  .preview-icon { font-size: 18px; }
+
+  .btn-remover-img {
+    background: none; border: 1px solid #e8b4ae;
+    color: var(--error); border-radius: 6px;
+    padding: 4px 10px; font-size: 12px; font-weight: 600;
+    cursor: pointer; white-space: nowrap;
+    transition: background .15s;
+  }
+  .btn-remover-img:hover { background: #fdf0ee; }
+
+  .upload-error {
+    margin-top: 7px;
+    font-size: 12px; color: var(--error);
+  }
+
+  /* ── SUBMIT BTN ── */
+  .btn-submit {
+    width: 100%;
+    height: 52px;
+    background: var(--royal);
+    color: var(--white);
+    border: none;
+    border-radius: 10px;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 700;
+    font-size: 18px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: background .2s, transform .1s;
+    margin-top: 8px;
+  }
+  .btn-submit:hover { background: var(--royal-dark); }
+  .btn-submit:active { transform: scale(.99); }
+
+  /* ── SUCCESS ── */
+  .success-banner {
+    display: none;
+    background: #e9f7ef;
+    border: 1.5px solid #a8d5b9;
+    border-radius: 10px;
+    padding: 18px 20px;
+    margin-top: 20px;
+    text-align: center;
+  }
+  .success-banner .s-icon { font-size: 32px; margin-bottom: 6px; }
+  .success-banner .s-title {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 700;
+    font-size: 18px;
+    color: var(--success);
+    margin-bottom: 4px;
+  }
+  .success-banner .s-text { font-size: 13px; color: #2e7d52; }
+
+  /* ── MODAL OVERLAY ── */
+  .modal-overlay {
+    display: none;
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,.55);
+    z-index: 200;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+  }
+  .modal-overlay.open { display: flex; }
+
+  .modal {
+    background: var(--white);
+    border-radius: 14px;
+    overflow: hidden;
+    width: 100%;
+    max-width: 900px;
+    box-shadow: 0 20px 60px rgba(0,0,0,.3);
+    max-height: 90vh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .modal-header {
+    background: var(--royal-dark);
+    padding: 18px 24px;
+    display: flex; align-items: center; justify-content: space-between;
+  }
+
+  .modal-header-info {
+    display: flex; align-items: center; gap: 10px;
+  }
+
+  .modal-title {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 700;
+    font-size: 18px;
+    color: var(--white);
+    letter-spacing: .5px;
+    text-transform: uppercase;
+  }
+
+  .btn-close {
+    background: rgba(255,255,255,.15);
+    border: none;
+    color: var(--white);
+    width: 32px; height: 32px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 18px;
+    display: flex; align-items: center; justify-content: center;
+    transition: background .2s;
+  }
+  .btn-close:hover { background: rgba(255,255,255,.28); }
+
+  /* LOGIN SECTION */
+  .modal-login {
+    padding: 36px 32px;
+  }
+
+  .modal-login-title {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 700;
+    font-size: 22px;
+    color: var(--royal-dark);
+    margin-bottom: 6px;
+  }
+  .modal-login-sub { font-size: 13px; color: var(--gray-4); margin-bottom: 28px; }
+
+  .login-field { margin-bottom: 18px; }
+  .login-field label {
+    display: block;
+    font-size: 12px; font-weight: 600;
+    text-transform: uppercase; letter-spacing: .8px;
+    color: var(--gray-4); margin-bottom: 7px;
+  }
+  .login-field input {
+    width: 100%; height: 48px;
+    border: 1.5px solid var(--gray-6);
+    border-radius: 8px;
+    padding: 0 16px;
+    font-family: 'Barlow', sans-serif;
+    font-size: 16px; color: var(--gray-1);
+    transition: border-color .18s, box-shadow .18s;
+  }
+  .login-field input:focus {
+    outline: none;
+    border-color: var(--royal-mid);
+    box-shadow: 0 0 0 3px rgba(33,80,194,.12);
+  }
+
+  .btn-login {
+    width: 100%; height: 50px;
+    background: var(--royal);
+    color: var(--white);
+    border: none; border-radius: 9px;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 700; font-size: 17px;
+    letter-spacing: 1px; text-transform: uppercase;
+    cursor: pointer;
+    transition: background .2s;
+    margin-top: 4px;
+  }
+  .btn-login:hover { background: var(--royal-dark); }
+
+  .login-error {
+    display: none;
+    background: #fdf0ee;
+    border: 1px solid #e8b4ae;
+    border-radius: 7px;
+    padding: 10px 14px;
+    font-size: 13px;
+    color: var(--error);
+    margin-top: 14px;
+  }
+
+  /* GESTOR PAINEL */
+  .modal-panel {
+    display: none;
+    flex-direction: column;
+    overflow: hidden;
+  }
+  .modal-panel.active { display: flex; }
+
+  .panel-toolbar {
+    padding: 16px 24px;
+    background: var(--gray-7);
+    border-bottom: 1px solid var(--gray-6);
+    display: flex; align-items: center; justify-content: space-between;
+    flex-wrap: wrap; gap: 12px;
+  }
+
+  .panel-stats {
+    display: flex; gap: 20px; flex-wrap: wrap;
+  }
+
+  .stat-item {
+    text-align: center;
+  }
+  .stat-num {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 26px; font-weight: 900;
+    color: var(--royal);
+    line-height: 1;
+  }
+  .stat-lbl {
+    font-size: 11px; color: var(--gray-4);
+    text-transform: uppercase; letter-spacing: .6px;
+    font-weight: 600;
+  }
+
+  .btn-export {
+    background: var(--royal);
+    color: var(--white);
+    border: none;
+    border-radius: 8px;
+    padding: 10px 20px;
+    font-family: 'Barlow', sans-serif;
+    font-weight: 600; font-size: 14px;
+    cursor: pointer;
+    display: flex; align-items: center; gap: 8px;
+    transition: background .2s;
+  }
+  .btn-export:hover { background: var(--royal-dark); }
+
+  .panel-table-wrap {
+    overflow: auto;
+    flex: 1;
+  }
+
+  .panel-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+  }
+
+  .panel-table thead tr {
+    background: var(--royal);
+    color: var(--white);
+  }
+
+  .panel-table thead th {
+    padding: 11px 14px;
+    text-align: left;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 700;
+    font-size: 13px;
+    letter-spacing: .5px;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+
+  .panel-table tbody tr {
+    border-bottom: 1px solid var(--gray-6);
+    transition: background .12s;
+  }
+  .panel-table tbody tr:hover { background: var(--royal-pale); }
+
+  .panel-table tbody td {
+    padding: 10px 14px;
+    color: var(--gray-2);
+    white-space: nowrap;
+  }
+
+  .badge {
+    display: inline-block;
+    padding: 2px 10px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: .3px;
+  }
+  .badge-adm { background: #f3e8ff; color: #6b21a8; }
+  .badge-b { background: #dcfce7; color: #15803d; }
+  .badge-c { background: #fef9c3; color: #854d0e; }
+  .badge-d { background: #fce7f3; color: #9d174d; }
+
+  .empty-state {
+    text-align: center;
+    padding: 48px 24px;
+    color: var(--gray-5);
+  }
+  .empty-state .e-icon { font-size: 40px; margin-bottom: 10px; }
+  .empty-state .e-text { font-size: 14px; }
+
+  .panel-logado {
+    font-size: 12px; color: var(--gray-5);
+    padding: 8px 24px;
+    border-bottom: 1px solid var(--gray-6);
+    background: var(--white);
+    display: flex; align-items: center; gap: 6px;
+  }
+  .panel-logado strong { color: var(--royal-dark); }
+
+  /* Divisor */
+  .divider {
+    height: 1px;
+    background: var(--gray-6);
+    margin: 8px 0 22px;
+  }
+
+  /* responsive */
+  @media (max-width: 520px) {
+    .row-2 { grid-template-columns: 1fr; }
+    .card-body { padding: 20px 16px; }
+    .page { padding: 24px 12px 50px; }
+    .header { padding: 0 16px; }
+    .panel-toolbar { flex-direction: column; align-items: flex-start; }
+  }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header class="header">
+  <div class="header-brand">
+    <div class="header-icon">🏗️</div>
+    <div>
+      <div class="header-title">Justificativa de Batida de Ponto</div>
+    </div>
+  </div>
+  <button class="btn-gestor" onclick="abrirModalGestor()">
+    🔒 Login Gestor
+  </button>
+</header>
+
+<!-- MAIN -->
+<main class="page">
+  <div class="page-title">Justificativa de Batida de Ponto</div>
+  <p class="page-desc">Preencha sua matrícula para registrar a justificativa da batida de ponto.</p>
+
+  <div class="card">
+    <div class="card-header">
+      <span class="card-header-icon">📋</span>
+      <span class="card-header-title">Dados do Funcionário & Ocorrência</span>
+    </div>
+    <div class="card-body">
+
+      <!-- MATRÍCULA -->
+      <div class="field">
+        <label>Matrícula <span class="req">*</span></label>
+        <input type="text" id="matricula" placeholder="Ex.: 120252" maxlength="10"
+          oninput="buscarFuncionario(this.value)" autocomplete="off">
+        <div class="field-info" id="matricula-hint">Digite sua matrícula para autopreenchimento.</div>
+      </div>
+
+      <!-- INFO BOX (aparece ao encontrar) -->
+      <div class="info-box" id="funcionario-box" style="display:none;">
+        <div class="info-box-icon">👤</div>
+        <div class="info-box-text">
+          <strong id="fb-nome"></strong>
+          <span id="fb-funcao"></span>
+        </div>
+      </div>
+
+      <div class="row-2">
+        <div class="field">
+          <label>Nome</label>
+          <input type="text" id="nome" class="readonly-styled" readonly placeholder="Preenchido automaticamente">
+        </div>
+        <div class="field">
+          <label>Função / Cargo</label>
+          <input type="text" id="funcao" class="readonly-styled" readonly placeholder="Preenchido automaticamente">
+        </div>
+      </div>
+
+      <div class="divider"></div>
+
+      <!-- DIA E HORA -->
+      <div class="row-2">
+        <div class="field">
+          <label>Data da Falha <span class="req">*</span></label>
+          <input type="date" id="data-falha">
+        </div>
+        <div class="field">
+          <label>Hora da Falha <span class="req">*</span></label>
+          <input type="time" id="hora-falha">
+        </div>
+      </div>
+
+      <!-- TURNO -->
+      <div class="field">
+        <label>Turno <span class="req">*</span></label>
+        <div class="select-wrap">
+          <select id="turno">
+            <option value="">— Selecione o turno —</option>
+            <option value="A">Turno A</option>
+            <option value="B">Turno B</option>
+            <option value="C">Turno C</option>
+            <option value="D">Turno D</option>
+            <option value="ADM">Turno ADM</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- GESTOR -->
+      <div class="field">
+        <label>Gestor Responsável <span class="req">*</span></label>
+        <div class="select-wrap">
+          <select id="supervisor">
+            <option value="">— Selecione o gestor —</option>
+            <option value="Diego Oliveira">Diego Oliveira</option>
+            <option value="Éder Carlos">Éder Carlos</option>
+            <option value="Jhonatan Lima">Jhonatan Lima</option>
+            <option value="Lucas Appelt">Lucas Appelt</option>
+            <option value="Marcos Goulart">Marcos Goulart</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- OBSERVAÇÃO OBRIGATÓRIA -->
+      <div class="field">
+        <label>Motivo / Justificativa <span class="req">*</span></label>
+        <textarea id="observacao" placeholder="Descreva o motivo da falha na batida de ponto..."></textarea>
+      </div>
+
+      <!-- ANEXAR IMAGEM -->
+      <div class="field">
+        <label>Anexar Comprovante (opcional) — máx. 5 MB</label>
+        <div class="upload-area" id="upload-area" onclick="document.getElementById('arquivo-img').click()">
+          <div class="upload-icon">📎</div>
+          <div class="upload-text">Clique para selecionar uma imagem</div>
+          <div class="upload-hint">JPG, PNG, WEBP ou PDF — até 5 MB</div>
+        </div>
+        <input type="file" id="arquivo-img" accept="image/*,application/pdf" style="display:none" onchange="handleArquivo(this)">
+        <div class="upload-preview" id="upload-preview" style="display:none">
+          <div class="preview-info">
+            <span class="preview-icon">🖼️</span>
+            <span id="preview-nome"></span>
+            <span id="preview-tamanho" style="color:var(--gray-5);font-size:12px;margin-left:6px"></span>
+          </div>
+          <button type="button" class="btn-remover-img" onclick="removerArquivo()">✕ Remover</button>
+        </div>
+        <div class="upload-error" id="upload-error" style="display:none">⚠ Arquivo muito grande. Máximo permitido: 5 MB.</div>
+      </div>
+
+      <button class="btn-submit" onclick="registrar()">✔ Enviar</button>
+
+      <div class="success-banner" id="success-banner">
+        <div class="s-icon">✅</div>
+        <div class="s-title">Falha registrada com sucesso!</div>
+        <div class="s-text" id="success-text"></div>
+      </div>
+
+    </div>
+  </div>
+</main>
+
+<!-- MODAL GESTOR -->
+<div class="modal-overlay" id="modal-overlay" onclick="fecharModalSeFora(event)">
+  <div class="modal" id="modal">
+
+    <!-- HEADER DO MODAL -->
+    <div class="modal-header">
+      <div class="modal-header-info">
+        <span style="font-size:20px;">🔒</span>
+        <span class="modal-title" id="modal-titulo">Acesso Gestor</span>
+      </div>
+      <button class="btn-close" onclick="fecharModal()">✕</button>
+    </div>
+
+    <!-- LOGIN -->
+    <div class="modal-login" id="modal-login">
+      <div class="modal-login-title">Área Restrita</div>
+      <div class="modal-login-sub">Acesso exclusivo para supervisores e coordenadores.</div>
+
+      <div class="login-field">
+        <label>Matrícula</label>
+        <input type="text" id="login-matricula" placeholder="Digite sua matrícula"
+          onkeydown="if(event.key==='Enter') fazerLogin()" autocomplete="off">
+      </div>
+
+      <button class="btn-login" onclick="fazerLogin()">Entrar</button>
+      <div class="login-error" id="login-error">Matrícula não autorizada. Acesso negado.</div>
+    </div>
+
+    <!-- PAINEL GESTOR -->
+    <div class="modal-panel" id="modal-panel">
+      <div class="panel-logado">🔐 Logado como: <strong id="gestor-nome-logado"></strong></div>
+
+      <div class="panel-toolbar">
+        <div class="panel-stats">
+          <div class="stat-item">
+            <div class="stat-num" id="stat-total">0</div>
+            <div class="stat-lbl">Registros</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-num" id="stat-hoje">0</div>
+            <div class="stat-lbl">Hoje</div>
+          </div>
+        </div>
+        <button class="btn-export" onclick="exportarExcel()">
+          📊 Exportar Excel (.xlsx)
+        </button>
+      </div>
+
+      <div class="panel-table-wrap">
+        <div class="empty-state" id="empty-state">
+          <div class="e-icon">📂</div>
+          <div class="e-text">Nenhum registro encontrado ainda.</div>
+        </div>
+        <table class="panel-table" id="tabela-registros" style="display:none;">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Data / Hora Falha</th>
+              <th>Matrícula</th>
+              <th>Nome</th>
+              <th>Função</th>
+              <th>Turno</th>
+              <th>Gestor</th>
+              <th>Justificativa</th>
+              <th>Anexo</th>
+              <th>Registrado em</th>
+            </tr>
+          </thead>
+          <tbody id="tbody"></tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+// ── BASE DE DADOS ──
+const FUNCIONARIOS = {
+  "120252": { nome: "ADELMO SANTOS BARBOSA", funcao: "OPERADOR DE CAMINHAO TIPO MUNC" },
+  "120121": { nome: "AGNALDO WESLEN NUNES DE SOUSA", funcao: "OPERADOR DE GUINDASTE-70T A 10" },
+  "120254": { nome: "ALEX DE OLIVEIRA NASCIMENTO", funcao: "OPERADOR DE GUINDASTE-40T A 69" },
+  "120059": { nome: "ANILSON SILVA DE OLIVEIRA", funcao: "OPERADOR DE CAMINHAO TIPO MUNC" },
+  "120185": { nome: "ANTONIO ALVES SILVA", funcao: "OPERADOR DE EMPILHADEIRA" },
+  "120205": { nome: "CAIO CESAR ALVES DE ANDRADE", funcao: "OPERADOR DE CAMINHAO TIPO MUNC" },
+  "120054": { nome: "DANIEL DENIS AMORIM DE SOUSA", funcao: "OPERADOR DE GUINDASTE II" },
+  "120123": { nome: "DENNYS ARAGAO BARBOSA", funcao: "OPERADOR DE CAMINHAO PRANCHA" },
+  "120222": { nome: "DIEGO COSTA LOPES", funcao: "SINALEIRO DE CARGA" },
+  "120067": { nome: "DIEGO DA SILVA LEAL", funcao: "OPERADOR DE GUINDASTE I" },
+  "120223": { nome: "DIEGO DE ALMEIDA MATOS", funcao: "OPERADOR DE GUINDASTE II" },
+  "120084": { nome: "DOUGLAS CRUZ DA SILVA", funcao: "OPERADOR DE GUINDASTE II" },
+  "120060": { nome: "EDIMILSON DE JESUS COSTA", funcao: "OPERADOR DE CAMINHAO TIPO MUNC" },
+  "120202": { nome: "EDINALDO MALHEIRO DA SILVA", funcao: "OPERADOR DE GUINDASTE-40T A 69" },
+  "120118": { nome: "ERNANIS CHARLES CHAPADENSE", funcao: "OPERADOR DE GUINDASTE I" },
+  "120251": { nome: "GEILDO DA SILVA LIMA", funcao: "OPERADOR DE CAMINHAO TIPO MUNC" },
+  "120162": { nome: "HUGNEY CASTRO PESSOA", funcao: "SINALEIRO DE CARGA" },
+  "120188": { nome: "JAILSON DA SILVA SANTOS", funcao: "SINALEIRO DE CARGA" },
+  "120149": { nome: "JOAB DIAS RODRIGUES", funcao: "OPERADOR DE CAMINHAO TIPO MUNC" },
+  "120092": { nome: "JONAS RIBEIRO SILVA", funcao: "OPERADOR DE CAMINHAO TIPO MUNC" },
+  "120037": { nome: "JONH WILLAME SANTOS", funcao: "SINALEIRO DE CARGA" },
+  "120190": { nome: "JONILSON MOURA RODRIGUES", funcao: "OPERADOR DE EMPILHADEIRA" },
+  "120259": { nome: "LUCAS SILVA CAVALCANTE", funcao: "OPERADOR DE CAMINHAO TIPO MUNC" },
+  "120198": { nome: "JOSE DOS SANTOS GONCALVES", funcao: "OPERADOR DE CAMINHAO TIPO MUNC" },
+  "120072": { nome: "JOSE FREIRE SILVA", funcao: "OPERADOR DE CAMINHAO PRANCHA" },
+  "120173": { nome: "JOSE JACKSON GARCIA CABRAL", funcao: "OPERADOR DE CAMINHAO TIPO MUNC" },
+  "120071": { nome: "KLEBE SANTOS DE ARAUJO", funcao: "OPERADOR DE CAMINHAO TIPO MUNC" },
+  "120099": { nome: "LAILSON DOS SANTOS GOMES", funcao: "OPERADOR DE CAMINHAO TIPO MUNC" },
+  "120033": { nome: "LEONARDO DA SILVA BATISTA", funcao: "SINALEIRO DE CARGA" },
+  "120203": { nome: "LUCAS DA SILVA MELO", funcao: "TECNICO DE PROGRAMACAO" },
+  "120174": { nome: "LUCIANO MARTINS DO NASCIMENTO", funcao: "OPERADOR DE GUINDASTE II" },
+  "120018": { nome: "LUIS EDUARDO DOS SANTOS FERREIRA", funcao: "SINALEIRO DE CARGA" },
+  "120038": { nome: "MADSON MOISES DA S DAS MERCES", funcao: "SINALEIRO DE CARGA" },
+  "120278": { nome: "MARCOS DA SILVA OLIVEIRA", funcao: "SINALEIRO DE CARGA" },
+  "120055": { nome: "MARINALDO FERREIRA DIAS", funcao: "OPERADOR DE GUINDASTE I" },
+  "120264": { nome: "JOSE DOS SANTOS", funcao: "OPERADOR DE GUINDASTE II" },
+  "120208": { nome: "MAX ROBERT SILVA", funcao: "OPERADOR DE CAMINHAO TIPO MUNC" },
+  "120120": { nome: "NEUFRAN NAIVA DE OLIVEIRA", funcao: "OPERADOR DE GUINDASTE-70T A 10" },
+  "120136": { nome: "OSVALDO DA SILVA ROCHA JUNIOR", funcao: "OPERADOR DE CAMINHAO PRANCHA" },
+  "120021": { nome: "PAULO DE MORAES MEDEIROS", funcao: "SINALEIRO DE CARGA" },
+  "120040": { nome: "RENATA ALVES GOMES", funcao: "SINALEIRO DE CARGA" },
+  "120022": { nome: "ROMILDO DA SILVA CUNHA", funcao: "SINALEIRO DE CARGA" },
+  "120176": { nome: "SAYLON MAIA TAVARES", funcao: "SINALEIRO DE CARGA" },
+  "120080": { nome: "TONY VALENTE MENDONCA", funcao: "PROJETISTA RIGGER" },
+  "120029": { nome: "WALTERLY SANTOS", funcao: "OPERADOR DE EMPILHADEIRA" },
+  "120216": { nome: "WANDERLEY MAGALHAES CARDOSO", funcao: "OPERADOR DE GUINDASTE I" },
+  "120113": { nome: "WELLITON DE OLIVEIRA MATOS", funcao: "OPERADOR DE CAMINHAO PRANCHA" },
+  "120277": { nome: "WILLAS DE JESUS COELHO FURTADO", funcao: "OPERADOR DE CAMINHAO TIPO MUNC" },
+  "120048": { nome: "WILLIAN SANTOS NINA", funcao: "OPERADOR DE EMPILHADEIRA" },
+  "120262": { nome: "MARIO SERGIO DE OLIVEIRA", funcao: "OPERADOR DE CAMINHAO TIPO MUNC" },
+  "120238": { nome: "ÉDER CARLOS DIAS DA SILVA", funcao: "SUPERVISOR AREA OPERACAO" },
+  "120236": { nome: "EDNELSON SILVA CARVALHO", funcao: "TECNICO EM SEGURANCA DO TRABAL" },
+};
+
+// Matrículas autorizadas para acesso gestor
+const GESTORES = ["120238", "120203"]; // Éder Carlos + Lucas (técnico) — adicione conforme necessário
+// Também permita qualquer matrícula de supervisor por nome
+const NOMES_GESTORES = [
+  "Lucas Appelt", "Éder Carlos", "Jhonatan Lima", "Marcos Goulart"
+];
+// Matrícula extra para gestores (coordenador)
+const MATRICULAS_GESTORES_EXTRA = ["120238"];
+
+// Para fins do sistema, gestores podem ser qualquer matrícula cujo cargo inclua supervisor/técnico ou que esteja na lista
+function isGestor(mat) {
+  if (MATRICULAS_GESTORES_EXTRA.includes(mat)) return true;
+  const f = FUNCIONARIOS[mat];
+  if (!f) return false;
+  const cargo = f.funcao.toLowerCase();
+  return cargo.includes("supervisor") || cargo.includes("coordenador") || cargo.includes("tecnico de programacao") || cargo.includes("seguranca");
+}
+
+let registros = JSON.parse(localStorage.getItem('ponto_registros') || '[]');
+let gestorLogado = null;
+let arquivoAnexo = null;
+
+// ── UPLOAD DE ARQUIVO ──
+function handleArquivo(input) {
+  const file = input.files[0];
+  const errEl = document.getElementById('upload-error');
+  const preview = document.getElementById('upload-preview');
+  errEl.style.display = 'none';
+  if (!file) return;
+  if (file.size > 5 * 1024 * 1024) {
+    errEl.style.display = 'block';
+    input.value = '';
+    return;
+  }
+  arquivoAnexo = { nome: file.name, tamanho: (file.size / 1024).toFixed(1) + ' KB' };
+  document.getElementById('preview-nome').textContent = file.name;
+  document.getElementById('preview-tamanho').textContent = arquivoAnexo.tamanho;
+  preview.style.display = 'flex';
+}
+
+function removerArquivo() {
+  arquivoAnexo = null;
+  document.getElementById('arquivo-img').value = '';
+  document.getElementById('upload-preview').style.display = 'none';
+  document.getElementById('upload-error').style.display = 'none';
+}
+
+// ── BUSCAR FUNCIONÁRIO ──
+function buscarFuncionario(val) {
+  const mat = val.trim();
+  const hint = document.getElementById('matricula-hint');
+  const box = document.getElementById('funcionario-box');
+  if (FUNCIONARIOS[mat]) {
+    const f = FUNCIONARIOS[mat];
+    document.getElementById('nome').value = f.nome;
+    document.getElementById('funcao').value = f.funcao;
+    document.getElementById('fb-nome').textContent = f.nome;
+    document.getElementById('fb-funcao').textContent = f.funcao;
+    box.style.display = 'flex';
+    hint.textContent = '✔ Funcionário encontrado.';
+    hint.style.color = '#1c7a3d';
+  } else {
+    document.getElementById('nome').value = '';
+    document.getElementById('funcao').value = '';
+    box.style.display = 'none';
+    if (mat.length >= 6) {
+      hint.textContent = '⚠ Matrícula não encontrada.';
+      hint.style.color = '#c0392b';
+    } else {
+      hint.textContent = 'Digite sua matrícula para autopreenchimento.';
+      hint.style.color = '';
+    }
+  }
+  document.getElementById('success-banner').style.display = 'none';
+}
+
+// ── REGISTRAR ──
+function registrar() {
+  const mat = document.getElementById('matricula').value.trim();
+  const data = document.getElementById('data-falha').value;
+  const hora = document.getElementById('hora-falha').value;
+  const turno = document.getElementById('turno').value;
+  const supervisor = document.getElementById('supervisor').value;
+  const obs = document.getElementById('observacao').value.trim();
+
+  if (!mat || !FUNCIONARIOS[mat]) { alert('Por favor, informe uma matrícula válida.'); return; }
+  if (!data) { alert('Informe a data da falha.'); return; }
+  if (!hora) { alert('Informe a hora da falha.'); return; }
+  if (!turno) { alert('Selecione o turno.'); return; }
+  if (!supervisor) { alert('Selecione o gestor responsável.'); return; }
+  if (!obs) { alert('O campo "Motivo / Justificativa" é obrigatório.'); return; }
+
+  const f = FUNCIONARIOS[mat];
+  const agora = new Date();
+  const registro = {
+    id: Date.now(),
+    matricula: mat,
+    nome: f.nome,
+    funcao: f.funcao,
+    dataFalha: data,
+    horaFalha: hora,
+    turno: turno,
+    supervisor: supervisor,
+    observacao: obs,
+    anexoNome: arquivoAnexo ? arquivoAnexo.nome : '',
+    registradoEm: agora.toLocaleString('pt-BR')
+  };
+
+  registros.push(registro);
+  localStorage.setItem('ponto_registros', JSON.stringify(registros));
+
+  const banner = document.getElementById('success-banner');
+  document.getElementById('success-text').textContent =
+    `${f.nome} — ${data} às ${hora} | Turno ${turno} | Gestor: ${supervisor}`;
+  banner.style.display = 'block';
+
+  // Limpar campos de ocorrência (manter matrícula/nome)
+  document.getElementById('data-falha').value = '';
+  document.getElementById('hora-falha').value = '';
+  document.getElementById('turno').value = '';
+  document.getElementById('supervisor').value = '';
+  document.getElementById('observacao').value = '';
+  removerArquivo();
+
+  banner.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+
+// ── MODAL GESTOR ──
+function abrirModalGestor() {
+  document.getElementById('modal-overlay').classList.add('open');
+  document.getElementById('modal-login').style.display = 'block';
+  document.getElementById('modal-panel').classList.remove('active');
+  document.getElementById('modal-titulo').textContent = 'Acesso Gestor';
+  document.getElementById('login-matricula').value = '';
+  document.getElementById('login-error').style.display = 'none';
+  setTimeout(() => document.getElementById('login-matricula').focus(), 100);
+}
+
+function fecharModal() {
+  document.getElementById('modal-overlay').classList.remove('open');
+  gestorLogado = null;
+}
+
+function fecharModalSeFora(e) {
+  if (e.target === document.getElementById('modal-overlay')) fecharModal();
+}
+
+function fazerLogin() {
+  const mat = document.getElementById('login-matricula').value.trim();
+  if (isGestor(mat) && FUNCIONARIOS[mat]) {
+    gestorLogado = { matricula: mat, ...FUNCIONARIOS[mat] };
+    document.getElementById('login-error').style.display = 'none';
+    document.getElementById('modal-login').style.display = 'none';
+    document.getElementById('modal-titulo').textContent = 'Painel do Gestor';
+    document.getElementById('modal-panel').classList.add('active');
+    document.getElementById('gestor-nome-logado').textContent = gestorLogado.nome;
+    renderTabela();
+  } else {
+    document.getElementById('login-error').style.display = 'block';
+  }
+}
+
+// ── RENDERIZAR TABELA ──
+function renderTabela() {
+  registros = JSON.parse(localStorage.getItem('ponto_registros') || '[]');
+  const tbody = document.getElementById('tbody');
+  const tabela = document.getElementById('tabela-registros');
+  const empty = document.getElementById('empty-state');
+
+  document.getElementById('stat-total').textContent = registros.length;
+  const hoje = new Date().toISOString().slice(0,10);
+  const countHoje = registros.filter(r => r.dataFalha === hoje).length;
+  document.getElementById('stat-hoje').textContent = countHoje;
+
+  if (!registros.length) {
+    empty.style.display = 'block';
+    tabela.style.display = 'none';
+    return;
+  }
+
+  empty.style.display = 'none';
+  tabela.style.display = 'table';
+  tbody.innerHTML = '';
+
+  const ordenados = [...registros].reverse();
+  ordenados.forEach((r, i) => {
+    const turnoKey = r.turno.toLowerCase();
+    const badgeClass = turnoKey === 'adm' ? 'badge-adm' : `badge-${turnoKey}`;
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td>${ordenados.length - i}</td>
+      <td>${formatarData(r.dataFalha)} ${r.horaFalha}</td>
+      <td><strong>${r.matricula}</strong></td>
+      <td>${capitalizar(r.nome)}</td>
+      <td style="color:var(--gray-4)">${capitalizar(r.funcao)}</td>
+      <td><span class="badge ${badgeClass}">Turno ${r.turno}</span></td>
+      <td>${r.supervisor}</td>
+      <td style="max-width:160px;white-space:normal;color:var(--gray-4)">${r.observacao || '—'}</td>
+      <td style="color:var(--gray-5);font-size:12px">${r.anexoNome ? '📎 ' + r.anexoNome : '—'}</td>
+      <td style="color:var(--gray-5);font-size:12px">${r.registradoEm}</td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
+
+function formatarData(d) {
+  if (!d) return '';
+  const [y,m,dia] = d.split('-');
+  return `${dia}/${m}/${y}`;
+}
+
+function capitalizar(str) {
+  return str.split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()).join(' ');
+}
+
+// ── EXPORTAR EXCEL ──
+function exportarExcel() {
+  if (!registros.length) { alert('Nenhum registro para exportar.'); return; }
+
+  const dados = registros.map((r, i) => ({
+    'Nº': i + 1,
+    'Data da Falha': formatarData(r.dataFalha),
+    'Hora da Falha': r.horaFalha,
+    'Matrícula': r.matricula,
+    'Nome': capitalizar(r.nome),
+    'Função / Cargo': capitalizar(r.funcao),
+    'Turno': `Turno ${r.turno}`,
+    'Gestor Responsável': r.supervisor,
+    'Justificativa / Motivo': r.observacao || '',
+    'Anexo': r.anexoNome || '',
+    'Registrado em': r.registradoEm,
+  }));
+
+  const ws = XLSX.utils.json_to_sheet(dados);
+
+  ws['!cols'] = [
+    { wch: 5 },
+    { wch: 14 },
+    { wch: 12 },
+    { wch: 12 },
+    { wch: 32 },
+    { wch: 30 },
+    { wch: 12 },
+    { wch: 22 },
+    { wch: 40 },
+    { wch: 25 },
+    { wch: 22 },
+  ];
+
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, 'Justificativas de Ponto');
+
+  const agora = new Date();
+  const gestores = {};
+  const turnos = { A: 0, B: 0, C: 0, D: 0, ADM: 0 };
+  registros.forEach(r => {
+    gestores[r.supervisor] = (gestores[r.supervisor] || 0) + 1;
+    if (turnos[r.turno] !== undefined) turnos[r.turno]++;
+  });
+
+  const resumoDados = [
+    ['RESUMO — JUSTIFICATIVA DE BATIDA DE PONTO'],
+    [`Gerado em: ${agora.toLocaleString('pt-BR')}`],
+    [`Total de registros: ${registros.length}`],
+    [],
+    ['Por Gestor', 'Quantidade'],
+    ...Object.entries(gestores).map(([k,v]) => [k, v]),
+    [],
+    ['Por Turno', 'Quantidade'],
+    ['Turno A', turnos.A],
+    ['Turno B', turnos.B],
+    ['Turno C', turnos.C],
+    ['Turno D', turnos.D],
+    ['Turno ADM', turnos.ADM],
+  ];
+
+  const ws2 = XLSX.utils.aoa_to_sheet(resumoDados);
+  ws2['!cols'] = [{ wch: 28 }, { wch: 14 }];
+  XLSX.utils.book_append_sheet(wb, ws2, 'Resumo');
+
+  const data = agora.toISOString().slice(0,10);
+  XLSX.writeFile(wb, `justificativas_ponto_${data}.xlsx`);
+}
+
+// Definir data de hoje como padrão
+document.getElementById('data-falha').valueAsDate = new Date();
+</script>
+</body>
+</html>
